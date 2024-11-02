@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  experimental: {},
+  serverExternalPackages: ["node-llama-cpp"],
 };
 
 export default nextConfig;

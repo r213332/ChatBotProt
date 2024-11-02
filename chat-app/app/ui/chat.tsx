@@ -7,7 +7,7 @@ export default function Chat() {
   return (
     <div>
       <form action={chatBot}>
-        <Button size="md" color="primary">
+        <Button size="md" color="primary" type="submit">
           Chat
         </Button>
       </form>
