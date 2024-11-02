@@ -18,6 +18,7 @@ export default function Chat() {
     },
   });
   const handleSubmit = () => {
+    if (input === "" || loading) return;
     append({
       id: crypto.randomUUID(),
       role: "user",
@@ -49,7 +50,7 @@ export default function Chat() {
   }, []);
   return (
     <div className="flex flex-col w-[70%] h-[70%] items-center justify-center">
-      <div className="flex flex-col grow w-full p-3 gap-10 overflow-scroll">
+      <div className="flex flex-col grow w-full p-3 gap-10 overflow-y-auto">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -72,6 +73,13 @@ export default function Chat() {
             inputWrapper: "",
           }}
           value={input}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              console.log("Enter key pressed");
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
           onValueChange={setInput}
           placeholder="質問してみてください"
           minRows={1}
@@ -82,6 +90,7 @@ export default function Chat() {
               variant="light"
               size="sm"
               isIconOnly
+              disabled={input === ""}
               isLoading={loading}
               onClick={handleSubmit}
             >
