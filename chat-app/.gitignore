@@ -12,6 +12,7 @@
 
 # llamaモデル
 /.models/
+/models/
 
 # testing
 /coverage
