@@ -4,6 +4,8 @@ import { Button, Textarea } from "@nextui-org/react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { useChat } from "../lib/chat";
 import { useEffect, useRef } from "react";
+import { Message } from "./message";
+import { ChatTemplate } from "./chat-template";
 
 export default function Chat() {
   // メッセージ送信時に最下部にスクロールするためのref
@@ -34,37 +36,18 @@ export default function Chat() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 初期メッセージ
-  useEffect(() => {
-    setMessages([
-      {
-        id: crypto.randomUUID(),
-        role: "user",
-        content: "Hello!",
-      },
-      {
-        id: crypto.randomUUID(),
-        role: "bot",
-        content: "Hello! How can I help you?",
-      },
-    ]);
-  }, []);
   return (
-    <div className="flex flex-col w-[70%] h-[70%] items-center justify-center">
+    <div className="flex flex-col w-[70%] h-full items-center justify-center pb-32 pt-16">
+      <ChatTemplate />
       <div className="flex flex-col grow w-full p-3 gap-10 overflow-y-auto">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`${
-              message.role === "user" ? "self-end" : "self-start"
-            } p-2 rounded-lg bg-gray-400 min-w-[30%] max-w-[60%]`}
-          >
-            <p>
-              <strong>{message.role === "user" ? "You" : "Bot"}</strong>
-            </p>
-            <p>{message.content}</p>
-          </div>
-        ))}
+        {messages.length != 0 &&
+          messages.map((message) => (
+            <Message
+              key={message.id}
+              role={message.role}
+              content={message.content}
+            />
+          ))}
         <div ref={endRef} />
       </div>
       <div className="pt-4 w-full h-15">
