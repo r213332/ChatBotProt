@@ -22,11 +22,18 @@ export default function Chat() {
   const handleSubmit = () => {
     if (input === "" || loading) return;
     setInput("");
-    append({
-      id: crypto.randomUUID(),
-      role: "user",
-      content: input,
-    })
+    const body = {
+      question: input,
+      messages: messages,
+    };
+    append(
+      {
+        id: crypto.randomUUID(),
+        role: "user",
+        content: input,
+      },
+      body
+    )
       .then(() => setInput(""))
       .catch((e) => console.error(e));
   };

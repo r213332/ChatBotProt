@@ -4,11 +4,11 @@ import { chatBot } from "@/server_actions/chat/chat_bot";
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const { userMessage } = body;
+  const { question, messages } = body;
 
   // console.log("Chat message:", body);
 
-  const stream = await chatBot(userMessage.content);
+  const stream = await chatBot(question, messages);
 
   //   const stream = new ReadableStream({
   //     start(controller) {

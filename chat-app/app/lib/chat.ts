@@ -7,6 +7,11 @@ export type Message = {
   content: string;
 };
 
+export type body = {
+  question: string;
+  messages: Message[];
+};
+
 export function useChat({
   api,
   onFinish,
@@ -18,7 +23,7 @@ export function useChat({
   const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const append = async (userMessage: Message) => {
+  const append = async (userMessage: Message, body: body) => {
     setLoading(true);
     const botMessage: Message = {
       id: crypto.randomUUID(),
@@ -28,7 +33,7 @@ export function useChat({
     setMessages([...messages, userMessage, botMessage]);
     await fetchEventSource(api, {
       method: "POST",
-      body: JSON.stringify({ userMessage }),
+      body: JSON.stringify(body),
       onmessage: (message) => {
         if (message.event === "data") {
           // console.log('eventMessage', message.data);
