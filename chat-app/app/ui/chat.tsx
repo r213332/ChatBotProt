@@ -19,6 +19,7 @@ export default function Chat() {
   });
   const handleSubmit = () => {
     if (input === "" || loading) return;
+    setInput("");
     append({
       id: crypto.randomUUID(),
       role: "user",

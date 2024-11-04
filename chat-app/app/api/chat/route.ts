@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
 
   const { userMessage } = body;
 
-  console.log("Chat message:", body);
+  // console.log("Chat message:", body);
 
   const stream = await chatBot(userMessage.content);
 
