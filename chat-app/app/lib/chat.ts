@@ -26,7 +26,7 @@ export function useChat({
   const append = async (userMessage: Message, body: body) => {
     setLoading(true);
     const botMessage: Message = {
-      id: crypto.randomUUID(),
+      id: (messages.length + 1).toString(),
       role: "bot",
       content: "",
     };

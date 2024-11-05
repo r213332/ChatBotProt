@@ -28,7 +28,7 @@ export default function Chat() {
     };
     append(
       {
-        id: crypto.randomUUID(),
+        id: messages.length.toString(),
         role: "user",
         content: input,
       },
