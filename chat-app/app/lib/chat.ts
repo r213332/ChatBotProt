@@ -10,6 +10,8 @@ export type Message = {
 export type body = {
   question: string;
   messages: Message[];
+  mode: "RAG" | "chat";
+  file: File | null;
 };
 
 export function useChat({
@@ -33,6 +35,7 @@ export function useChat({
     setMessages([...messages, userMessage, botMessage]);
     await fetchEventSource(api, {
       method: "POST",
+      openWhenHidden: true,
       body: JSON.stringify(body),
       onmessage: (message) => {
         if (message.event === "data") {

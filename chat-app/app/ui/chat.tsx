@@ -2,18 +2,24 @@
 
 import { Button, Textarea } from "@nextui-org/react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
-import { useChat } from "../lib/chat";
-import { useEffect, useRef } from "react";
+import { body, useChat } from "../lib/chat";
+import { useEffect, useRef, useState } from "react";
 import { Message } from "./message";
 import { ChatTemplate } from "./chat-template";
 
 export default function Chat() {
   // メッセージ送信時に最下部にスクロールするためのref
   const endRef = useRef<HTMLDivElement>(null);
+  // RAGモード
+  const [rag, setRag] = useState<boolean>(false);
+  const setRagHandler = (value: boolean) => {
+    setRag(value);
+  };
+  const [file, setFile] = useState<File | null>(null);
   // チャットAPIのエンドポイント
   const api = "http://localhost:3000/api/chat";
   // チャット
-  const { messages, setMessages, input, loading, setInput, append } = useChat({
+  const { messages, input, loading, setInput, append } = useChat({
     api,
     onFinish: (message) => {
       console.log("Chat finished:", message);
@@ -22,9 +28,11 @@ export default function Chat() {
   const handleSubmit = () => {
     if (input === "" || loading) return;
     setInput("");
-    const body = {
+    const body: body = {
       question: input,
       messages: messages,
+      mode: rag ? "RAG" : "chat",
+      file: file,
     };
     append(
       {
@@ -45,7 +53,7 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col w-[70%] h-full items-center justify-center pb-32 pt-16">
-      <ChatTemplate />
+      <ChatTemplate rag={rag} setRag={setRagHandler} />
       <div className="flex flex-col grow w-full p-3 gap-10 overflow-y-auto">
         {messages.length != 0 &&
           messages.map((message) => (
