@@ -7,6 +7,15 @@ import { useEffect, useRef, useState } from "react";
 import { Message } from "./message";
 import { ChatTemplate } from "./chat-template";
 
+const getFileBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 export default function Chat() {
   // メッセージ送信時に最下部にスクロールするためのref
   const endRef = useRef<HTMLDivElement>(null);
@@ -15,10 +24,10 @@ export default function Chat() {
   const setRagHandler = (value: boolean) => {
     setRag(value);
   };
-  // const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  // const filecontent
   // チャットAPIのエンドポイント
   const api = process.env.NEXT_PUBLIC_API_PATH + "/api/chat";
-  console.log("API:", api);
   // チャット
   const { messages, input, loading, setInput, append } = useChat({
     api,
@@ -26,14 +35,14 @@ export default function Chat() {
       console.log("Chat finished:", message);
     },
   });
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (input === "" || loading) return;
     setInput("");
     const body: body = {
       question: input,
       messages: messages,
       mode: rag ? "RAG" : "chat",
-      file: null,
+      file: file ? await getFileBase64(file) : undefined,
     };
     append(
       {
@@ -54,7 +63,7 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col w-[70%] h-full items-center justify-center pb-32 pt-16">
-      <ChatTemplate rag={rag} setRag={setRagHandler} />
+      <ChatTemplate rag={rag} setRag={setRagHandler} setFile={setFile} />
       <div className="flex flex-col grow w-full p-3 gap-10 overflow-y-auto">
         {messages.length != 0 &&
           messages.map((message) => (

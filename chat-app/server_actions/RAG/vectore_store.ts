@@ -5,33 +5,37 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { TextLoader } from "langchain/document_loaders/fs/text";
 
 // PDFのみ
-export async function CreateVectorStore(file: File) {
-  // PDF読み込み
-  // const pdfLoader = new PDFLoader(file);
-  // const docs = await pdfLoader.load();
-  // text読み込み
-  // const textLoader = new TextLoader(file);
-  // const docs = await textLoader.load();
-  // test
-  const text = `
-  生体運動制御システム研究室ではヒトの運動システムを解明し， それを応用した新しいシステムに関する研究を行っています。
-人の運動はとても巧みな運動や、早く、力強い運動など、 様々な運動ができます。
-このような運動ができるのは、 脳神経系がどのように手足を動かすかを決定し、 筋肉を制御することで実現できています。 
-この、ヒトの運動がどのような原理で行なわれているのかを調べるために、 現在、様々な観点からの研究が世界中で行なわれています。 
-その一つとして、計算論的神経科学と呼ばれる分野が存在します。 
-  `;
+export async function CreateVectorStore(file: string) {
+  const fileData = file.replace(/^data:\w+\/\w+;base64,/, "");
+  const type = file.split(";")[0].split(":")[1];
+  const buffer = Buffer.from(fileData, "base64");
+  const blob = new Blob([buffer], { type });
+  let docs;
+  if (type.includes("application/pdf")) {
+    // PDF読み込み
+    const pdfLoader = new PDFLoader(blob);
+    docs = await pdfLoader.load();
+  } else if (type.includes("text/plain")) {
+    // text読み込み
+    const textLoader = new TextLoader(blob);
+    docs = await textLoader.load();
+  }
+
+  // ドキュメントが読み込めなかった場合
+  if (!docs) {
+    throw new Error("Failed to load document");
+  }
 
   const textSplitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 10,
-    chunkOverlap: 0,
+    chunkSize: 1000,
+    chunkOverlap: 10,
   });
-  const splits = await textSplitter.splitText(text);
+  const splits = await textSplitter.splitDocuments(docs);
 
   console.log(splits);
 
-  const vectorStore = await MemoryVectorStore.fromTexts(
+  const vectorStore = await MemoryVectorStore.fromDocuments(
     splits,
-    splits.map(() => "https://bmcs.cs.tut.ac.jp/new/study"),
     new OllamaEmbeddings({
       model: "kun432/cl-nagoya-ruri-large",
     })

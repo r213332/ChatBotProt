@@ -3,17 +3,21 @@ import { chatBot } from "@/server_actions/chat/chat_bot";
 import { CreateVectorStore } from "@/server_actions/RAG/vectore_store";
 import { IterableReadableStream } from "@langchain/core/utils/stream";
 import { RAGBot } from "@/server_actions/RAG/chat_bot";
+import { body } from "@/app/lib/chat";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const { question, messages, file, mode } = body;
+  const { question, messages, file, mode }: body = body;
 
-  // console.log("Chat message:", body);
+  // console.log("Chat message:", file);
 
   let stream: IterableReadableStream<Uint8Array>;
   if (mode === "RAG") {
     console.log("RAG mode");
+    if (file === undefined) {
+      throw new Error("RAG mode requires file");
+    }
     const vectorStore = await CreateVectorStore(file);
     console.log("Vector store created");
     stream = await RAGBot(vectorStore, question, messages);

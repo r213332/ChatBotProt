@@ -75,7 +75,7 @@ export function Message({
           {content === "" ? (
             <Spinner />
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto w-full">
               <ReactMarkDown components={{ pre: Pre }}>{content}</ReactMarkDown>
             </div>
           )}

@@ -11,7 +11,7 @@ export type body = {
   question: string;
   messages: Message[];
   mode: "RAG" | "chat";
-  file: File | null;
+  file?: string;
 };
 
 export function useChat({
@@ -62,7 +62,6 @@ export function useChat({
         }
       },
       onerror: (e) => {
-        console.error(e);
         setLoading(false);
         throw e;
       },
