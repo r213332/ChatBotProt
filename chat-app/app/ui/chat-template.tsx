@@ -22,7 +22,7 @@ export function ChatTemplate({
       <div className="bg-gray-400 w-[30%] h-full rounded-md p-3">
         <h2>RAG</h2>
         <p>
-          ファイルをアップロードしてその内容についてチャットします。ファイルは保存されません。
+          ファイルをアップロードしてその内容についてチャットします。ファイルは保存されません。工事中...
         </p>
         <div className="flex w-full gap-2 items-center justify-end">
           <p>RAGを試す</p>

@@ -15,9 +15,10 @@ export default function Chat() {
   const setRagHandler = (value: boolean) => {
     setRag(value);
   };
-  const [file, setFile] = useState<File | null>(null);
+  // const [file, setFile] = useState<File | null>(null);
   // チャットAPIのエンドポイント
-  const api = "http://localhost:3000/api/chat";
+  const api = process.env.NEXT_PUBLIC_API_PATH + "/api/chat";
+  console.log("API:", api);
   // チャット
   const { messages, input, loading, setInput, append } = useChat({
     api,
@@ -32,7 +33,7 @@ export default function Chat() {
       question: input,
       messages: messages,
       mode: rag ? "RAG" : "chat",
-      file: file,
+      file: null,
     };
     append(
       {
