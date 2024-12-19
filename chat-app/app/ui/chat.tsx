@@ -1,8 +1,10 @@
 "use client";
 
-import { Button, Textarea } from "@nextui-org/react";
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
-import { body, useChat } from "../lib/chat";
+// import { Button, Textarea } from "@nextui-org/react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, SendHorizonal } from "lucide-react";
+import { Message as ChatMessage, useChat } from "../lib/chat";
 import { useEffect, useRef, useState } from "react";
 import { Message } from "./message";
 import { ChatTemplate } from "./chat-template";
@@ -25,32 +27,34 @@ export default function Chat() {
     setRag(value);
   };
   const [file, setFile] = useState<File | null>(null);
-  // const filecontent
-  // チャットAPIのエンドポイント
-  const api = process.env.NEXT_PUBLIC_API_PATH + "/api/chat";
   // チャット
-  const { messages, input, loading, setInput, append } = useChat({
-    api,
-    onFinish: (message) => {
-      console.log("Chat finished:", message);
-    },
-  });
+  const { messages, input, loading, setInput, append } = useChat();
+  const onFinish = async (message: ChatMessage) => {
+    console.log("Chat finished:", message);
+  };
+
+  // textaria参照
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handlechange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = `38px`;
+      console.log(textAreaRef.current.scrollHeight);
+      textAreaRef.current.style.height = `${Math.max(
+        textAreaRef.current.scrollHeight,
+        38
+      )}px`;
+    }
+  };
+
   const handleSubmit = async () => {
     if (input === "" || loading) return;
     setInput("");
-    const body: body = {
-      question: input,
-      messages: messages,
-      mode: rag ? "RAG" : "chat",
-      file: file ? await getFileBase64(file) : undefined,
-    };
     append(
-      {
-        id: messages.length.toString(),
-        role: "user",
-        content: input,
-      },
-      body
+      rag ? "RAG" : "chat",
+      file ? await getFileBase64(file) : "",
+      onFinish
     )
       .then(() => setInput(""))
       .catch((e) => console.error(e));
@@ -75,12 +79,11 @@ export default function Chat() {
           ))}
         <div ref={endRef} />
       </div>
-      <div className="pt-4 w-full h-15">
+      <div className="p-2 w-full h-15 flex gap-2 items-end border-1 rounded-md">
         <Textarea
-          className="w-"
-          classNames={{
-            inputWrapper: "",
-          }}
+          rows={1}
+          className="resize-none border-none"
+          ref={textAreaRef}
           value={input}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
@@ -89,24 +92,16 @@ export default function Chat() {
               handleSubmit();
             }
           }}
-          onValueChange={setInput}
+          onChange={handlechange}
           placeholder="質問してみてください"
-          minRows={1}
-          endContent={
-            <Button
-              className="!w-auto !h-auto"
-              color="primary"
-              variant="light"
-              size="sm"
-              isIconOnly
-              disabled={input === ""}
-              isLoading={loading}
-              onClick={handleSubmit}
-            >
-              <PaperAirplaneIcon className="w-5 h-5" />
-            </Button>
-          }
         ></Textarea>
+        <Button
+          disabled={input === "" || loading}
+          size="icon"
+          onClick={handleSubmit}
+        >
+          {loading ? <Loader2 /> : <SendHorizonal className="w-5 h-5" />}
+        </Button>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
-import { Switch, Input } from "@nextui-org/react";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Bot, BookOpenText } from "lucide-react";
 
 export function ChatTemplate({
@@ -38,9 +39,6 @@ export function ChatTemplate({
           <Input
             className="w-80"
             accept="application/pdf, text/plain"
-            classNames={{
-              inputWrapper: "bg-gray-200",
-            }}
             type="file"
             onChange={(e) => {
               const file = e.target.files?.item(0);
@@ -52,7 +50,7 @@ export function ChatTemplate({
         </div>
         <div className="flex w-full gap-2 items-center justify-end">
           <p>RAGを試す</p>
-          <Switch isSelected={rag} onValueChange={setRag}></Switch>
+          <Switch checked={rag} onCheckedChange={setRag}></Switch>
         </div>
       </div>
     </div>

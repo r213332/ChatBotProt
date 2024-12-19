@@ -1,8 +1,9 @@
-import { Button, Spinner } from "@nextui-org/react";
+import { Button } from "@/components/ui/button";
 import { ClassAttributes, HTMLAttributes, useState } from "react";
 import ReactMarkDown, { ExtraProps } from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { ClipboardIcon } from "@heroicons/react/16/solid";
+import { Loader2 } from "lucide-react";
 
 export function Message({
   role,
@@ -46,11 +47,10 @@ export function Message({
             ) : (
               <Button
                 className="text-gray-500 !h-auto !w-auto"
-                size="sm"
-                isIconOnly
-                onPress={onCopy}
+                size="icon"
+                onClick={onCopy}
               >
-                <ClipboardIcon className="h-5 w-5" />
+                <ClipboardIcon />
               </Button>
             )}
           </div>
@@ -73,7 +73,7 @@ export function Message({
         </p>
         <div className="flex justify-center items-center">
           {content === "" ? (
-            <Spinner />
+            <Loader2 className="animate-spin" />
           ) : (
             <div className="overflow-x-auto w-full">
               <ReactMarkDown components={{ pre: Pre }}>{content}</ReactMarkDown>
