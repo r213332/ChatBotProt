@@ -4,18 +4,38 @@ import { CreateVectorStore } from "@/server_actions/RAG/vectore_store";
 import { IterableReadableStream } from "@langchain/core/utils/stream";
 import { RAGBot } from "@/server_actions/RAG/chat_bot";
 import { body } from "@/app/lib/chat";
+import { z } from "zod";
+
+const requestSchema = z.object({
+  question: z.string(),
+  messages: z.array(
+    z.object({
+      id: z.string(),
+      role: z.enum(["user", "bot"]),
+      content: z.string(),
+    })
+  ),
+  mode: z.enum(["RAG", "chat"]),
+  file: z.string(),
+});
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const { question, messages, file, mode }: body = body;
+  const parsedBody = requestSchema.safeParse(body);
+
+  if (!parsedBody.success) {
+    throw new Error("Invalid request body");
+  }
+
+  const { question, messages, mode, file } = parsedBody.data as body;
 
   // console.log("Chat message:", file);
 
   let stream: IterableReadableStream<Uint8Array>;
   if (mode === "RAG") {
     console.log("RAG mode");
-    if (file === undefined) {
+    if (file === "") {
       throw new Error("RAG mode requires file");
     }
     const vectorStore = await CreateVectorStore(file);

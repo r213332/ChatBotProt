@@ -3,10 +3,8 @@
 // import { ChatLlamaCpp } from "@langchain/community/chat_models/llama_cpp";
 import { ChatOllama } from "@langchain/ollama";
 import {
-  AIMessage,
   BaseMessage,
   HumanMessage,
-  MessageContentText,
   SystemMessage,
 } from "@langchain/core/messages";
 import { Message } from "@/app/lib/chat";
@@ -17,6 +15,7 @@ import {
 import { RunnableSequence } from "@langchain/core/runnables";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { ScoreThresholdRetriever } from "langchain/retrievers/score_threshold";
 
 export async function RAGBot(
   vectoreStore: MemoryVectorStore,
@@ -24,7 +23,11 @@ export async function RAGBot(
   messages: Message[]
 ) {
   console.log("RAG Chat bot invoked");
-  const retriever = vectoreStore.asRetriever();
+
+  // const retriever = vectoreStore.asRetriever();
+  const retriever = ScoreThresholdRetriever.fromVectorStore(vectoreStore, {
+    minSimilarityScore: 0.2,
+  });
 
   // チャットボット本体の定義
   const template = ChatPromptTemplate.fromMessages([
@@ -73,6 +76,7 @@ export async function RAGBot(
         messages: BaseMessage[];
       }) => {
         const document = await retriever.invoke(question.content as string);
+        console.log("RAGBot context:", document);
         return formatDocumentsAsString(document);
       },
     },

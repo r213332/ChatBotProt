@@ -11,32 +11,46 @@ export type body = {
   question: string;
   messages: Message[];
   mode: "RAG" | "chat";
-  file?: string;
+  file: string;
 };
 
-export function useChat({
-  api,
-  onFinish,
-}: {
-  api: string;
-  onFinish?: (message: Message) => void;
-}) {
+const api = process.env.NEXT_PUBLIC_API_PATH + "/api/chat";
+
+export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const append = async (userMessage: Message, body: body) => {
+  const append = async (
+    mode: "RAG" | "chat",
+    file: string,
+    onFinish: (message: Message) => Promise<void>
+  ) => {
     setLoading(true);
-    const botMessage: Message = {
+    const prevMessages = messages.slice();
+    const userMessage: Message = {
       id: (messages.length + 1).toString(),
+      role: "user",
+      content: input,
+    };
+    const botMessage: Message = {
+      id: (messages.length + 2).toString(),
       role: "bot",
       content: "",
     };
-    setMessages([...messages, userMessage, botMessage]);
+
+    setMessages([...prevMessages, userMessage, botMessage]);
+
+    const request: body = {
+      question: input,
+      messages: [...prevMessages, userMessage, botMessage],
+      mode,
+      file,
+    };
     await fetchEventSource(api, {
       method: "POST",
       openWhenHidden: true,
-      body: JSON.stringify(body),
+      body: JSON.stringify(request),
       onmessage: (message) => {
         if (message.event === "data") {
           // console.log('eventMessage', message.data);
@@ -47,7 +61,7 @@ export function useChat({
             if (data.data?.chunk?.kwargs?.content) {
               // console.log(data.data?.chunk?.kwargs.content);
               botMessage.content += data.data?.chunk?.kwargs.content;
-              setMessages([...messages, userMessage, botMessage]);
+              setMessages([...prevMessages, userMessage, botMessage]);
             }
           } else if (data.event == "on_chat_model_end") {
             // console.log('on_chat_model_end', data);
