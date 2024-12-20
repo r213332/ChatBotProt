@@ -7,7 +7,7 @@ import {
   HumanMessage,
   SystemMessage,
 } from "@langchain/core/messages";
-import { Message } from "@/app/lib/chat";
+import { Message } from "@/hooks/use-chat";
 import {
   ChatPromptTemplate,
   MessagesPlaceholder,

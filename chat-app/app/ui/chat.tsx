@@ -1,10 +1,9 @@
 "use client";
 
-// import { Button, Textarea } from "@nextui-org/react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, SendHorizonal } from "lucide-react";
-import { Message as ChatMessage, useChat } from "../lib/chat";
+import { Message as ChatMessage, useChat } from "../../hooks/use-chat";
 import { useEffect, useRef, useState } from "react";
 import { Message } from "./message";
 import { ChatTemplate } from "./chat-template";

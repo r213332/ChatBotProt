@@ -3,7 +3,7 @@ import { chatBot } from "@/server_actions/chat/chat_bot";
 import { CreateVectorStore } from "@/server_actions/RAG/vectore_store";
 import { IterableReadableStream } from "@langchain/core/utils/stream";
 import { RAGBot } from "@/server_actions/RAG/chat_bot";
-import { body } from "@/app/lib/chat";
+import { body } from "@/hooks/use-chat";
 import { z } from "zod";
 
 const requestSchema = z.object({
