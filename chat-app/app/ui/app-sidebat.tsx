@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { fetchMockData } from "@/server_actions/mock";
+import { fetchMockData } from "@/server_components/mock";
 import Link from "next/link";
 
 // Menu items.

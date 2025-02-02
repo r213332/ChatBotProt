@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
-import { chatBot } from "@/server_actions/chat/chat_bot";
-import { CreateVectorStore } from "@/server_actions/RAG/vectore_store";
+import { chatBot } from "@/server_components/chat/chat_bot";
+import { CreateVectorStore } from "@/server_components/RAG/vectore_store";
 import { IterableReadableStream } from "@langchain/core/utils/stream";
-import { RAGBot } from "@/server_actions/RAG/chat_bot";
+import { RAGBot } from "@/server_components/RAG/chat_bot";
 import { body } from "@/hooks/use-chat";
 import { z } from "zod";
 
