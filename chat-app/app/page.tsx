@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import Chat from "./ui/chat";
+import Chat from "./ui/chat/chat";
 import { fetchModels } from "@/server_components/service/fetch/model";
 
 export default async function Home() {
