@@ -14,20 +14,20 @@ import {
 } from "@langchain/core/prompts";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { formatDocumentsAsString } from "langchain/util/document";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
-import { ScoreThresholdRetriever } from "langchain/retrievers/score_threshold";
+// import { ScoreThresholdRetriever } from "langchain/retrievers/score_threshold";
+import { WeaviateStore } from "@langchain/weaviate";
 
 export async function RAGBot(
-  vectoreStore: MemoryVectorStore,
+  vectoreStore: WeaviateStore,
   question: string,
   messages: Message[]
 ) {
   console.log("RAG Chat bot invoked");
 
-  // const retriever = vectoreStore.asRetriever();
-  const retriever = ScoreThresholdRetriever.fromVectorStore(vectoreStore, {
-    minSimilarityScore: 0.2,
-  });
+  const retriever = vectoreStore.asRetriever();
+  // const retriever = ScoreThresholdRetriever.fromVectorStore(vectoreStore, {
+  //   minSimilarityScore: 0.2,
+  // });
 
   // チャットボット本体の定義
   const template = ChatPromptTemplate.fromMessages([

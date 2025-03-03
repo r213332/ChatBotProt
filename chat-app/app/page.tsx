@@ -1,6 +1,8 @@
 import React, { Suspense } from "react";
 import Chat from "./ui/chat/chat";
 import { fetchModels } from "@/server_components/service/fetch/model";
+import { auth } from "@/auth";
+import { fetchUserBySession } from "@/server_components/service/fetch/user";
 
 export default async function Home() {
   return (
@@ -13,11 +15,20 @@ export default async function Home() {
 }
 
 async function Wrapper() {
-  const models = await fetchModels();
+  const session = await auth();
+  // console.log({ session });
+  // if (!session) {
+  //   redirect("/signin");
+  // }
+
+  const [user, models] = await Promise.all([
+    fetchUserBySession(session?.user?.name || undefined),
+    fetchModels(),
+  ]);
 
   return (
     <div className="flex-grow flex items-center justify-center">
-      <Chat models={models}></Chat>
+      <Chat userId={user?.id || undefined} models={models}></Chat>
     </div>
   );
 }

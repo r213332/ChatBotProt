@@ -24,7 +24,7 @@ export function useChat() {
   const append = async (
     mode: "RAG" | "chat",
     file: string,
-    onFinish: (message: Message) => Promise<void>
+    onFinish: (userMessage: Message, botMessage: Message) => Promise<void>
   ) => {
     setLoading(true);
     const prevMessages = messages.slice();
@@ -72,7 +72,7 @@ export function useChat() {
       onclose: () => {
         setLoading(false);
         if (onFinish) {
-          onFinish(botMessage);
+          onFinish(userMessage, botMessage);
         }
       },
       onerror: (e) => {

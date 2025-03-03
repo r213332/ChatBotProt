@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
     const vectorStore = await CreateVectorStore(file);
     console.log("Vector store created");
-    stream = await RAGBot(vectorStore, question, messages);
+    stream = await RAGBot(vectorStore.vectorStore, question, messages);
   } else {
     stream = await chatBot(question, messages);
   }

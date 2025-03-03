@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+// import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
-  //   console.log("Middleware called",req);
-  return NextResponse.next();
-}
+// export function middleware(req: NextRequest) {
+//   //   console.log("Middleware called",req);
+//   return NextResponse.next();
+// }
+
+export { auth as middleware } from "@/auth";

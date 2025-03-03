@@ -16,8 +16,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  createChatHistory,
+  createChatWithChatHistory,
+} from "@/server_components/chat/chat_history";
+import { chatBot } from "@/server_components/chat/chat_bot";
 
-export default function Chat({ models }: { models: Model[] }) {
+export default function Chat({
+  models,
+  userId,
+  chatId,
+}: {
+  models: Model[];
+  userId?: string;
+  chatId?: string;
+}) {
   // メッセージ送信時に最下部にスクロールするためのref
   const endRef = useRef<HTMLDivElement>(null);
   // RAGモード
@@ -28,8 +41,18 @@ export default function Chat({ models }: { models: Model[] }) {
   const [file, setFile] = useState<File | null>(null);
   // チャット
   const { messages, input, loading, setInput, append } = useChat();
-  const onFinish = async (message: ChatMessage) => {
-    console.log("Chat finished:", message);
+  const onFinish = async (
+    userMessage: ChatMessage,
+    botMessage: ChatMessage
+  ) => {
+    console.log("Chat finished:");
+    if (userId) {
+      if (chatId) {
+        await createChatHistory(chatId, userMessage, botMessage);
+      } else {
+        await createChatWithChatHistory(userId, userMessage, botMessage);
+      }
+    }
   };
 
   // textaria参照
@@ -64,10 +87,20 @@ export default function Chat({ models }: { models: Model[] }) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const testHandler = async () => {
+    const response = await chatBot("テスト", []);
+    for await (const message of response) {
+      // const dec = new TextDecoder("utf-8").decode(message);
+      console.log(message);
+      // console.log(JSON.parse(`{${dec}}`));
+    }
+  };
+
   return (
-    <div className="flex flex-col w-[70%] h-full items-center justify-center pb-32 pt-16">
-      <div className="absolute top-0 w-full bg-primary flex justify-center">
-        <div className="flex items-center justify-between w-[70%]">
+    <div className="flex flex-col h-full items-center justify-center">
+      {/* ヘッダー */}
+      <div className="top-0 w-full bg-primary flex justify-center">
+        <div className="flex items-center justify-between px-4">
           <div className="flex items-end gap-2 p-2">
             <p className="text-primary-foreground text-2xl font-bold p-2">
               チャット
@@ -84,10 +117,15 @@ export default function Chat({ models }: { models: Model[] }) {
                 ))}
               </SelectContent>
             </Select>
+            <Button size="icon" onClick={testHandler}>
+              テスト
+            </Button>
           </div>
         </div>
       </div>
+      {/* テンプレ */}
       <ChatTemplate rag={rag} setRag={setRagHandler} setFile={setFile} />
+      {/* メッセージ履歴 */}
       <div className="flex flex-col grow w-full p-3 gap-10 overflow-y-auto">
         {messages.length != 0 &&
           messages.map((message) => (
@@ -99,29 +137,32 @@ export default function Chat({ models }: { models: Model[] }) {
           ))}
         <div ref={endRef} />
       </div>
-      <div className="p-2 w-full h-15 flex gap-2 items-end border-1 rounded-md">
-        <Textarea
-          rows={1}
-          className="resize-none border-none"
-          ref={textAreaRef}
-          value={input}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              console.log("Enter key pressed");
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
-          onChange={handlechange}
-          placeholder="質問してみてください"
-        ></Textarea>
-        <Button
-          disabled={input === "" || loading}
-          size="icon"
-          onClick={handleSubmit}
-        >
-          {loading ? <Loader2 /> : <SendHorizonal className="w-5 h-5" />}
-        </Button>
+      {/* 入力欄 */}
+      <div className="p-4 pb-12 w-full h-15">
+        <div className="p-2 flex gap-2 w-full items-end border-2 border-primary rounded-md">
+          <Textarea
+            rows={1}
+            className="resize-none border-none"
+            ref={textAreaRef}
+            value={input}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                console.log("Enter key pressed");
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
+            onChange={handlechange}
+            placeholder="質問してみてください"
+          ></Textarea>
+          <Button
+            disabled={input === "" || loading}
+            size="icon"
+            onClick={handleSubmit}
+          >
+            {loading ? <Loader2 /> : <SendHorizonal className="w-5 h-5" />}
+          </Button>
+        </div>
       </div>
     </div>
   );

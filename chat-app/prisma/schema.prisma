@@ -15,12 +15,61 @@ datasource db {
 
 
 
+model User {
+  id        String @id @default(uuid()) @db.Uuid
+  session_id     String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  chats     Chat[]
+
+
+  @@map(name: "users")
+}
+
 model Model{
-  id              String @id @default(uuid())
+  id              String @id @default(uuid()) @db.Uuid
   name            String 
   description     String 
   vector_store_id String
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  // リレーション
+  chats     Chat[]
+
+  @@map(name: "models")
+}
+
+model Chat {
+  id        String    @id @default(uuid()) @db.Uuid
+  title     String    @db.Text
+  user_id   String    @db.Uuid
+  model_id  String?   @db.Uuid
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // 外部キー
+  User      User      @relation(fields: [user_id], references: [id])
+  Model     Model?    @relation(fields: [model_id], references: [id])
+
+  // リレーション
+  messages  Message[]
+
+  @@map(name: "chats")
+}
+
+model Message {
+  id        String @id @default(uuid()) @db.Uuid
+  chat_id   String  @db.Uuid
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 外部キー
+  Chat      Chat     @relation(fields: [chat_id], references: [id])
+
+  @@map(name: "messages")
 }
