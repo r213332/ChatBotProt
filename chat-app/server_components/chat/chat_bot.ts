@@ -147,33 +147,33 @@ export async function chatBot(question: string, messages: Message[]) {
 
   console.log("Chat bot finished", new HumanMessage(question));
 
-  const response = chain.stream({
-    question: new HumanMessage(question),
-    messages: messages.map((message) => {
-      if (message.role === "user") {
-        return new HumanMessage(message.content);
-      } else {
-        return new SystemMessage(message.content);
-      }
-    }),
-  });
+  // const response = chain.stream({
+  //   question: new HumanMessage(question),
+  //   messages: messages.map((message) => {
+  //     if (message.role === "user") {
+  //       return new HumanMessage(message.content);
+  //     } else {
+  //       return new SystemMessage(message.content);
+  //     }
+  //   }),
+  // });
 
-  // const response = chain.streamEvents(
-  //   {
-  //     question: new HumanMessage(question),
-  //     messages: messages.map((message) => {
-  //       if (message.role === "user") {
-  //         return new HumanMessage(message.content);
-  //       } else {
-  //         return new SystemMessage(message.content);
-  //       }
-  //     }),
-  //   },
-  //   {
-  //     version: "v2",
-  //     encoding: "text/event-stream",
-  //   }
-  // );
+  const response = chain.streamEvents(
+    {
+      question: new HumanMessage(question),
+      messages: messages.map((message) => {
+        if (message.role === "user") {
+          return new HumanMessage(message.content);
+        } else {
+          return new SystemMessage(message.content);
+        }
+      }),
+    },
+    {
+      version: "v2",
+      encoding: "text/event-stream",
+    }
+  );
 
   return response;
 }
